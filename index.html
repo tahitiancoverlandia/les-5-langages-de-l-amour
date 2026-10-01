@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Les 5 langages de l'amour</title>
+<meta name="apple-mobile-web-app-title" content="5 langages">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#FBEDE8">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="description" content="Notez les 5 langages de l'amour et découvrez votre classement : pour aimer et se sentir aimé.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Nunito:wght@400;700&display=swap">
+<style>
+  /* Même design que « L'art de jouir » : palette rosée, Cormorant Garamond + Nunito, cœurs flottants. */
+  :root {
+    --bg: #FBEDE8; --glow: #F6CFCB; --glow2: #F6CFCB; --heart-glow: transparent; --card-glow: transparent; --fg: #4A1526; --muted: #8C5A63; --surface: #FFF8F4; --line: #EBC9C4;
+    --accent: #C2264F; --on-accent: #FFFFFF; --heart: #E58A9C; --soft1: #FFE3E6; --soft2: #F7BFCA; --soft-edge: #EFA3B4;
+    --card-s: 78%; --card-l: 93%; --ink-s: 60%; --ink-l: 24%; --edge-l: 80%;
+    --display: "Cormorant Garamond", "Hoefler Text", Garamond, Georgia, serif;
+    --ui: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16050D; --glow: #5C1233; --glow2: #4A2209; --fg: #FCE9E4; --muted: #D6A6B0; --surface: #2E0D1B; --line: #6E2B42;
+      --accent: #FF6F91; --on-accent: #33040F; --heart: #F06A8C; --soft1: #6A1838; --soft2: #4A0F28; --soft-edge: #A8385C; --heart-glow: rgba(255, 111, 145, .55); --card-glow: rgba(255, 120, 150, .22);
+      --card-s: 50%; --card-l: 16%; --ink-s: 85%; --ink-l: 91%; --edge-l: 44%;
+      color-scheme: dark;
+    }
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { min-height: 100%; background: radial-gradient(130% 55% at 50% 0%, var(--glow), transparent 72%), radial-gradient(90% 40% at 50% 100%, var(--glow2), transparent 75%), var(--bg); background-attachment: fixed; }
+  body { margin: 0; background: transparent; color: var(--fg); font-family: var(--ui); font-size: 16px; line-height: 1.5; }
+
+  .hearts { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .hearts span { position: absolute; bottom: -40px; color: var(--heart); text-shadow: 0 0 14px var(--heart-glow); opacity: 0; animation: rise linear infinite; }
+  @keyframes rise { 0% { transform: translateY(0) rotate(-8deg); opacity: 0; } 15% { opacity: .5; } 85% { opacity: .35; } 100% { transform: translateY(-110vh) rotate(10deg); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .hearts span { animation: none; opacity: .25; bottom: auto; } }
+
+  main { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 22px 16px 40px; display: flex; flex-direction: column; gap: 14px; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  header { text-align: center; }
+  h1 { font-family: var(--display); font-style: italic; font-weight: 600; font-size: clamp(1.9rem, 8vw, 2.4rem); margin: 0; line-height: 1.05; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .subtitle { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 1.3rem; color: var(--accent); margin: 4px 0 8px; }
+  .intro { color: var(--muted); font-size: .92rem; margin: 0; }
+
+  #quiz { display: flex; flex-direction: column; gap: 12px; }
+  .progress-label { font-size: .85rem; color: var(--muted); margin: 0 0 6px; text-align: center; font-variant-numeric: tabular-nums; }
+  .progress-bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .progress-fill { height: 100%; width: 0; border-radius: 999px; background: var(--accent); transition: width .25s; }
+
+  .card, .result, .tips, .invite {
+    --h: 340;
+    background: hsl(var(--h) var(--card-s) var(--card-l));
+    color: hsl(var(--h) var(--ink-s) var(--ink-l));
+    box-shadow: inset 0 0 0 1px hsl(var(--h) var(--card-s) var(--edge-l)), 0 10px 30px -18px hsl(var(--h) 50% 20% / .6), 0 0 42px var(--card-glow);
+    border-radius: 26px; padding: 30px 28px 26px;
+    display: flex; flex-direction: column; gap: 12px; position: relative;
+  }
+  .card::before, .result::before, .tips::before, .invite::before { content: ""; position: absolute; inset: 10px; border: 1px solid currentColor; border-radius: 18px; opacity: .28; pointer-events: none; }
+  .card > *, .result > *, .tips > *, .invite > * { position: relative; margin: 0; }
+  .icon { font-size: 2.2rem; line-height: 1; text-align: center; }
+  .card h2, .result h2, .tips h2, .invite h2 { font-family: var(--display); font-style: italic; font-weight: 600; font-size: 1.9rem; line-height: 1.1; text-align: center; text-wrap: balance; }
+  .definition { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 1.35rem; line-height: 1.22; text-align: center; text-wrap: balance; }
+  .examples-title, .rating-title { font-size: .74rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; text-align: center; margin-top: 6px; }
+  .examples-title::before, .examples-title::after, .rating-title::before, .rating-title::after { content: "♥"; margin-inline: 8px; opacity: .6; }
+  .card ul { padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  .card li::marker { content: "♥  "; font-size: .7em; }
+
+  .rating { display: flex; align-items: center; justify-content: center; gap: 2px; }
+  .star { font-size: 2.2rem; line-height: 1; padding: 2px 5px; border: 0; background: transparent; color: currentColor; opacity: .22; transition: opacity .12s, color .12s, transform .12s; }
+  .star.on { color: var(--accent); opacity: 1; text-shadow: 0 0 14px var(--heart-glow); }
+  .star:hover { transform: scale(1.15); }
+  .rating-value { min-width: 2.4em; margin-left: 6px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .nav, .result-actions { display: flex; gap: 10px; }
+  .result-actions { flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+  .btn-plain, .btn-primary { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 14px 16px; font-weight: 700; }
+  .btn-plain {
+    background: linear-gradient(180deg, var(--soft1), var(--soft2)); border-color: var(--soft-edge);
+    box-shadow: 0 8px 18px -12px var(--accent), 0 0 18px var(--card-glow);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .btn-plain::before { content: "♥"; color: var(--accent); margin-right: 8px; }
+  .btn-plain:hover { transform: translateY(-1px); box-shadow: 0 10px 20px -10px var(--accent), 0 0 18px var(--card-glow); }
+  .btn-primary { flex: 1; background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-size: 1.05rem; box-shadow: 0 8px 20px -10px var(--accent); }
+  .btn-primary:disabled { opacity: .45; cursor: default; }
+  .nav-hint { text-align: center; color: var(--muted); font-size: .88rem; margin: 0; min-height: 1.4em; }
+
+  .result-hint { text-align: center; font-size: .92rem; opacity: .8; }
+  .ranking { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .ranking li {
+    --h: 340;
+    background: hsl(var(--h) var(--card-s) var(--card-l)); color: hsl(var(--h) var(--ink-s) var(--ink-l));
+    box-shadow: inset 0 0 0 1px hsl(var(--h) var(--card-s) var(--edge-l));
+    border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .rank { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--surface); color: var(--fg); border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .ranking li:not(.top) { opacity: .78; }
+  .ranking li.top {
+    padding: 16px 14px;
+    box-shadow: inset 0 0 0 2px var(--accent), 0 10px 24px -12px var(--accent), 0 0 30px var(--card-glow);
+  }
+  .ranking li.top .rank-name { font-size: 1.5rem; }
+  .rank-badge { display: block; font-family: var(--ui); font-style: normal; font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+  .ranking li.top .rank { width: 38px; height: 38px; font-size: 1.1rem; }
+  .ranking li.top .rank { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .rank-name { flex: 1; min-width: 0; font-family: var(--display); font-style: italic; font-weight: 600; font-size: 1.3rem; line-height: 1.15; }
+  .rank-score { flex: none; color: var(--accent); white-space: nowrap; font-size: .85rem; }
+  .rank-score small { color: inherit; font-weight: 700; font-size: .9rem; margin-left: 5px; }
+  .invite { margin-top: 22px; text-align: center; align-items: center; box-shadow: inset 0 0 0 2px var(--accent), 0 10px 30px -18px hsl(var(--h) 50% 20% / .6), 0 0 42px var(--card-glow); }
+  .invite .examples-title { margin-top: 0; }
+  .invite-text { text-wrap: balance; }
+  .invite .btn-primary { flex: none; margin-top: 6px; padding-inline: 34px; }
+  #conseils { display: flex; flex-direction: column; gap: 14px; }
+  .conseils-intro { font-family: var(--display); font-style: italic; font-weight: 600; font-size: 1.6rem; line-height: 1.15; text-align: center; text-wrap: balance; margin: 10px 0 0; }
+  .tips { box-shadow: inset 0 0 0 2px var(--accent), 0 10px 30px -18px hsl(var(--h) 50% 20% / .6), 0 0 42px var(--card-glow); }
+  .tips ol { padding-left: 22px; }
+  .tips li { margin-bottom: 8px; }
+  .tips li::marker { font-weight: 700; color: var(--accent); }
+  footer { text-align: center; color: var(--muted); font-size: .8rem; }
+</style>
+</head>
+<body>
+
+<div class="hearts" aria-hidden="true">
+  <span style="left:4%;font-size:14px;animation-duration:19s;animation-delay:-0s">♥</span>
+  <span style="left:10%;font-size:36px;animation-duration:24s;animation-delay:-6s">♥</span>
+  <span style="left:16%;font-size:24px;animation-duration:27s;animation-delay:-11s">♥</span>
+  <span style="left:21%;font-size:14px;animation-duration:21s;animation-delay:-3s">♥</span>
+  <span style="left:27%;font-size:24px;animation-duration:25s;animation-delay:-14s">♥</span>
+  <span style="left:33%;font-size:36px;animation-duration:18s;animation-delay:-8s">♥</span>
+  <span style="left:38%;font-size:14px;animation-duration:23s;animation-delay:-17s">♥</span>
+  <span style="left:44%;font-size:24px;animation-duration:29s;animation-delay:-1s">♥</span>
+  <span style="left:50%;font-size:14px;animation-duration:20s;animation-delay:-9s">♥</span>
+  <span style="left:55%;font-size:36px;animation-duration:26s;animation-delay:-20s">♥</span>
+  <span style="left:61%;font-size:24px;animation-duration:22s;animation-delay:-5s">♥</span>
+  <span style="left:67%;font-size:14px;animation-duration:28s;animation-delay:-13s">♥</span>
+  <span style="left:72%;font-size:36px;animation-duration:17s;animation-delay:-22s">♥</span>
+  <span style="left:78%;font-size:14px;animation-duration:24s;animation-delay:-2s">♥</span>
+  <span style="left:84%;font-size:24px;animation-duration:21s;animation-delay:-16s">♥</span>
+  <span style="left:89%;font-size:36px;animation-duration:27s;animation-delay:-10s">♥</span>
+  <span style="left:94%;font-size:14px;animation-duration:19s;animation-delay:-24s">♥</span>
+  <span style="left:97%;font-size:24px;animation-duration:25s;animation-delay:-7s">♥</span>
+</div>
+
+<main>
+  <header>
+    <h1>Les 5 langages de l'amour <em>♥</em></h1>
+    <p class="subtitle">Pour aimer et se sentir aimé</p>
+    <p class="intro">Chacun exprime et reçoit l'amour à sa manière. Découvrez les cinq langages un par un et donnez à chacun une note de <strong>1 à 5</strong> selon l'importance qu'il a pour vous. Votre classement apparaît à la fin.</p>
+  </header>
+
+  <div id="quiz">
+    <div class="progress">
+      <p class="progress-label" id="progress-label"></p>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <section id="grid" aria-live="polite"></section>
+    <div class="nav">
+      <button class="btn-plain" id="prev">Précédent</button>
+      <button class="btn-primary" id="next">Suivant →</button>
+    </div>
+    <p class="nav-hint" id="nav-hint"></p>
+  </div>
+
+  <section class="result" id="result" aria-live="polite" hidden>
+    <h2>Mon classement</h2>
+    <p class="result-hint">Vos cinq langages, de la meilleure note à la moins bonne. Les deux premiers sont ceux qui comptent le plus pour vous.</p>
+    <ol class="ranking" id="ranking"></ol>
+    <div class="result-actions">
+      <button class="btn-plain" id="edit">Revoir mes notes</button>
+      <button class="btn-plain" id="reset">Recommencer</button>
+    </div>
+  </section>
+
+  <section class="invite" id="invite" hidden>
+    <p class="examples-title">Et maintenant</p>
+    <h2>Et si votre partenaire parlait vos langages ?</h2>
+    <p class="invite-text" id="invite-text"></p>
+    <button class="btn-primary" id="to-conseils">Oui, montre-moi</button>
+  </section>
+
+  <div id="conseils" aria-live="polite" hidden></div>
+
+  <footer>D'après le concept des cinq langages de l'amour de Gary Chapman.</footer>
+</main>
+
+<script>
+  const LANGAGES = [
+    {
+      id: "paroles",
+      partenaire: [
+        "Lui dire simplement : « J'ai besoin d'entendre que tu m'aimes, les mots comptent beaucoup pour moi. »",
+        "Lui donner des exemples précis de phrases qui me touchent (« je suis fier de toi », « merci », « tu es beau/belle »).",
+        "Le/la remercier chaleureusement chaque fois qu'il/elle me fait un compliment, pour l'encourager à recommencer.",
+        "Lui proposer un petit rituel : se dire chaque soir une chose que l'on a appréciée chez l'autre.",
+        "Lui expliquer que les critiques et les mots durs me blessent plus que tout, et convenir ensemble d'une façon douce de se dire les choses.",
+        "Lui raconter un souvenir précis où ses mots m'ont fait du bien, pour qu'il/elle comprenne l'effet qu'ils ont sur moi.",
+        "Lui demander de m'écrire un petit message dans la journée, juste pour dire qu'il/elle pense à moi.",
+        "Lui dire que j'aime l'entendre parler de moi en bien devant nos proches.",
+        "Lui proposer de s'écrire une lettre ou une carte à chaque anniversaire de rencontre.",
+        "Lui expliquer que j'ai besoin d'encouragements quand je doute ou que je me lance dans un projet.",
+        "Lui demander de me dire ce qu'il/elle apprécie chez moi, pas seulement ce que je fais.",
+        "Commencer moi-même : lui faire un compliment sincère chaque jour pour installer l'habitude à deux.",
+        "Lui dire que « je t'aime » ne s'use pas, et que j'aime l'entendre souvent.",
+        "Lui proposer de laisser des petits mots sur le frigo, le miroir ou dans un sac.",
+        "Lui expliquer que le silence après un effort de ma part me fait douter, et qu'un simple « bravo » suffit.",
+        "Lui demander de me souhaiter une bonne journée le matin et une bonne nuit le soir, même à distance.",
+        "Lui faire savoir quels mots me touchent le plus : la reconnaissance, l'admiration ou la tendresse.",
+        "Lui proposer un moment chaque semaine pour se dire ce qui nous a plu chez l'autre.",
+        "Lui dire que j'aime les messages vocaux : entendre sa voix me rapproche de lui/elle.",
+        "Lui demander de me rassurer avec des mots quand nous traversons une période tendue.",
+        "Lui expliquer qu'un « merci » pour les petites choses du quotidien me donne envie d'en faire encore plus.",
+        "Lui proposer de remplir ensemble un bocal de petits mots doux à piocher les jours difficiles.",
+        "Lui demander, après une dispute, de mettre des mots sur la réconciliation : « je tiens à toi », « pardon ».",
+        "Lui dire que j'aime qu'il/elle remarque à voix haute mes efforts, ma tenue ou mes progrès.",
+        "Lui montrer ce test et lui lire ensemble la définition des paroles valorisantes."
+      ],
+      h: 340,
+      icon: "💬",
+      nom: "Les paroles valorisantes",
+      definition: "L'amour passe par les mots : compliments, encouragements et mots tendres qui disent à l'autre combien il compte.",
+      exemples: [
+        "Dire « je suis fier de toi » après un effort ou une réussite.",
+        "Laisser un petit mot doux sur l'oreiller ou envoyer un message tendre dans la journée.",
+        "Remercier sincèrement l'autre pour ce qu'il fait au quotidien."
+      ]
+    },
+    {
+      id: "cadeaux",
+      partenaire: [
+        "Lui expliquer que ce n'est pas le prix qui compte, mais le fait de savoir qu'il/elle a pensé à moi.",
+        "Partager une liste d'envies ou glisser des idées au fil des conversations pour lui faciliter la tâche.",
+        "Lui rappeler à l'avance les dates qui comptent pour moi (anniversaire, fête, date de rencontre).",
+        "Lui montrer ma joie quand je reçois une petite attention, même toute simple : une fleur, un mot, une friandise.",
+        "Lui proposer un rituel : se rapporter l'un à l'autre un petit souvenir après chaque voyage ou sortie.",
+        "Lui raconter un cadeau qui m'a marqué(e) et pourquoi, pour lui montrer ce qui me touche vraiment.",
+        "Lui dire que j'aime les surprises, même minuscules : un chocolat, une carte, une fleur cueillie.",
+        "Lui expliquer qu'un cadeau fait main ou personnalisé me touche plus qu'un objet cher.",
+        "Lui proposer de fixer ensemble un petit budget « attentions » pour que ce ne soit jamais une source de stress.",
+        "Lui montrer une chose qui me fait envie quand nous nous promenons, sans rien exiger.",
+        "Lui dire qu'un cadeau oublié à une date importante me fait de la peine, et pourquoi.",
+        "Garder et mettre en valeur ce qu'il/elle m'offre, pour qu'il/elle voie combien cela compte.",
+        "Lui offrir moi-même de petites attentions pour lui montrer l'exemple et installer l'habitude.",
+        "Lui expliquer que sa présence dans un moment difficile est aussi un cadeau précieux pour moi.",
+        "Lui proposer un calendrier partagé avec les dates qui comptent pour nous deux.",
+        "Lui dire que j'aime quand il/elle me rapporte quelque chose de ses déplacements, même un caillou ou une carte postale.",
+        "Lui suggérer de noter dans son téléphone les idées que je mentionne au fil de l'année.",
+        "Lui expliquer que l'emballage, le petit mot et le moment choisi font partie du cadeau.",
+        "Lui proposer de s'offrir chacun un petit cadeau symbolique à chaque étape de notre vie à deux.",
+        "Lui dire que j'aime recevoir quelque chose qui me rappelle un souvenir commun.",
+        "Lui expliquer que je ne mesure pas son amour au prix, mais à l'attention qu'il/elle y met.",
+        "Lui demander d'éviter les cadeaux de dernière minute choisis sans réfléchir, car j'y suis sensible.",
+        "Lui proposer une boîte à idées commune où chacun glisse ses envies.",
+        "Lui dire que j'aime les cadeaux qui se vivent aussi : une place de concert, un repas, une sortie.",
+        "Lui montrer ce test et lui lire ensemble la définition du langage des cadeaux."
+      ],
+      h: 22,
+      icon: "🎁",
+      nom: "Les cadeaux",
+      definition: "L'amour se voit dans un présent, petit ou grand : ce n'est pas le prix qui compte, mais la preuve que l'on a pensé à l'autre.",
+      exemples: [
+        "Rapporter sa pâtisserie préférée en rentrant du travail.",
+        "Offrir une fleur ou un souvenir sans occasion particulière.",
+        "Préparer un cadeau personnalisé pour un anniversaire ou une date importante."
+      ]
+    },
+    {
+      id: "toucher",
+      partenaire: [
+        "Lui dire clairement : « J'ai besoin de tendresse et de contact pour me sentir proche de toi. »",
+        "Lui préciser les gestes qui me font du bien : la main dans la main, les câlins, une main dans le dos.",
+        "Prendre l'initiative : me blottir contre lui/elle devant un film, lui prendre la main en marchant.",
+        "Instaurer un rituel : un vrai câlin de quelques secondes le matin en partant et le soir en se retrouvant.",
+        "Lui expliquer que la tendresse au quotidien compte autant pour moi que l'intimité.",
+        "Lui demander de me prendre dans ses bras quand je suis triste, avant même de chercher une solution.",
+        "Lui dire que j'aime qu'on s'embrasse pour se dire bonjour et au revoir, même pressés.",
+        "Lui proposer de s'endormir collés l'un contre l'autre, ne serait-ce que quelques minutes.",
+        "Lui expliquer qu'un geste tendre en public (une main, un bras autour de la taille) me rend fier/fière d'être avec lui/elle.",
+        "Lui demander un massage des épaules ou des pieds de temps en temps, et lui en offrir en retour.",
+        "Lui dire que j'aime qu'il/elle me touche en passant près de moi : une caresse dans le dos, une main sur l'épaule.",
+        "Lui proposer de s'asseoir côte à côte plutôt que face à face au restaurant ou sur le canapé.",
+        "Lui expliquer que l'absence de contact pendant plusieurs jours me donne l'impression qu'on s'éloigne.",
+        "Lui demander de me tenir la main dans les moments stressants : un rendez-vous médical, un trajet, une mauvaise nouvelle.",
+        "Lui dire quels gestes je n'aime pas, pour qu'il/elle sache aussi ce qui ne me convient pas.",
+        "Lui proposer de danser ensemble dans le salon, juste pour le plaisir d'être proches.",
+        "Lui demander, après une dispute, de se réconcilier aussi par un câlin.",
+        "Lui expliquer que me caresser les cheveux ou le visage m'apaise immédiatement.",
+        "Lui proposer un moment de tendresse sans écran avant de dormir.",
+        "Le/la remercier et lui dire le bien que ça me fait chaque fois qu'il/elle vient vers moi.",
+        "Lui demander de me réveiller par un baiser ou une caresse plutôt que par le réveil.",
+        "Lui dire que j'aime qu'on se tienne par le bras ou par la main en marchant dans la rue.",
+        "Lui proposer de prendre une douche ou un bain ensemble de temps en temps.",
+        "Lui expliquer que j'ai besoin de son contact surtout quand je suis fatigué(e) ou inquiet/inquiète.",
+        "Lui montrer ce test et lui lire ensemble la définition du toucher physique."
+      ],
+      h: 356,
+      icon: "🤗",
+      nom: "Le toucher physique",
+      definition: "L'amour se ressent par le contact : la proximité physique et les gestes tendres rassurent et créent le lien.",
+      exemples: [
+        "Se tenir la main en marchant.",
+        "Prendre l'autre dans ses bras pour dire bonjour ou le réconforter.",
+        "Offrir un massage des épaules après une longue journée."
+      ]
+    },
+    {
+      id: "moments",
+      partenaire: [
+        "Lui dire : « Ce qui me fait me sentir aimé(e), c'est quand tu es vraiment là, avec moi. »",
+        "Bloquer ensemble dans l'agenda un rendez-vous à deux chaque semaine, comme un rendez-vous important.",
+        "Lui demander de poser le téléphone et d'éteindre les écrans pendant nos moments à deux.",
+        "Lui proposer des activités précises à partager : une balade, cuisiner ensemble, un jeu, un week-end.",
+        "Lui dire à quel point un moment passé ensemble m'a fait du bien, pour lui donner envie de recommencer.",
+        "Lui demander un quart d'heure chaque soir pour se raconter notre journée, sans rien faire d'autre.",
+        "Lui expliquer que sa présence distraite, les yeux sur un écran, me fait me sentir seul(e).",
+        "Lui proposer de prendre le petit-déjeuner ensemble au moins une fois par semaine.",
+        "Lui dire que j'aime qu'il/elle me regarde et m'écoute vraiment quand je lui parle.",
+        "Organiser moi-même une sortie surprise pour lui montrer ce que j'aime vivre à deux.",
+        "Lui proposer de commencer ensemble une activité nouvelle : un cours, un sport, une série à suivre à deux.",
+        "Lui demander de ne pas annuler nos moments à deux, sauf vraie urgence.",
+        "Lui expliquer que la qualité compte plus que la durée : vingt minutes rien qu'à nous valent mieux qu'une soirée chacun de son côté.",
+        "Lui proposer une soirée sans téléphone par semaine.",
+        "Lui dire que j'aime faire les choses simples avec lui/elle : les courses, la cuisine, un trajet en voiture.",
+        "Lui demander de prévoir lui/elle-même un moment à deux de temps en temps, pour que l'initiative ne vienne pas toujours de moi.",
+        "Lui proposer un week-end en amoureux une ou deux fois par an, noté longtemps à l'avance.",
+        "Lui expliquer que j'ai besoin de temps avec lui/elle seul(e), pas seulement en famille ou entre amis.",
+        "Lui proposer une question à se poser chaque semaine pour mieux se connaître.",
+        "Lui dire que j'aime qu'on se couche à la même heure pour se retrouver en fin de journée.",
+        "Lui demander de m'accompagner à une activité qui compte pour moi, même si ce n'est pas sa passion.",
+        "Lui proposer une promenade après le dîner pour parler tranquillement.",
+        "Lui expliquer que quand il/elle reporte toujours nos moments, j'ai l'impression de passer après tout le reste.",
+        "Lui proposer de faire ensemble la liste des choses que nous rêvons de vivre à deux.",
+        "Lui montrer ce test et lui lire ensemble la définition des moments de qualité."
+      ],
+      h: 285,
+      icon: "⏳",
+      nom: "Les moments de qualité",
+      definition: "L'amour se vit dans le temps partagé : offrir à l'autre toute son attention, sans distraction.",
+      exemples: [
+        "Dîner en tête-à-tête, téléphones éteints.",
+        "Faire une promenade ensemble en discutant vraiment.",
+        "Réserver une soirée par semaine pour une activité à deux."
+      ]
+    },
+    {
+      id: "services",
+      partenaire: [
+        "Lui expliquer : « Quand tu m'aides, je me sens soutenu(e) et aimé(e). »",
+        "Lui indiquer les trois tâches qui me soulageraient le plus au quotidien.",
+        "Demander clairement et gentiment (« Peux-tu t'occuper de… ? ») plutôt que d'attendre qu'il/elle devine.",
+        "Le/la remercier sincèrement à chaque coup de main, sans critiquer la manière de faire.",
+        "Faire ensemble le point chaque semaine sur la répartition des tâches pour que chacun se sente épaulé.",
+        "Lui raconter une fois où son aide m'a vraiment soulagé(e), pour lui montrer l'effet que cela a sur moi.",
+        "Lui dire que j'aime qu'il/elle prenne l'initiative sans que j'aie à demander.",
+        "Lui proposer d'afficher la liste des tâches de la semaine pour que chacun voie ce qu'il y a à faire.",
+        "Lui expliquer que quand je porte tout tout(e) seul(e), je me sens délaissé(e) plus que fatigué(e).",
+        "Lui demander de prendre le relais les jours où je suis malade ou épuisé(e).",
+        "Lui dire quel petit geste du matin me fait plaisir : un café préparé, la voiture dégivrée, le lit fait.",
+        "Lui proposer d'échanger de temps en temps les tâches que chacun aime le moins.",
+        "Lui expliquer qu'une promesse d'aide non tenue me blesse, et que je préfère un « non » honnête.",
+        "Lui demander de s'occuper entièrement d'une chose du début à la fin (un repas, un rendez-vous, une démarche).",
+        "Lui rendre moi-même service avec le sourire, pour montrer que c'est ma façon de dire « je t'aime ».",
+        "Lui dire que j'aime qu'il/elle anticipe : faire le plein, sortir les poubelles, réserver le restaurant.",
+        "Lui proposer de préparer ensemble les repas de la semaine le dimanche.",
+        "Lui expliquer que m'aider dans un projet qui me tient à cœur compte énormément pour moi.",
+        "Lui demander de gérer les enfants ou la maison une soirée pour que je puisse souffler.",
+        "Lui dire, quand je suis débordé(e), la question qui me touche le plus : « Qu'est-ce que je peux faire pour toi ? »",
+        "Lui proposer une « mission surprise » par mois : chacun fait pour l'autre une chose qu'il/elle n'attend pas.",
+        "Lui expliquer que réparer, bricoler ou régler un souci pour moi est une vraie preuve d'amour à mes yeux.",
+        "Lui demander de me conduire ou de m'accompagner quand un rendez-vous m'inquiète.",
+        "Lui dire que j'aime qu'il/elle finisse ce qu'il/elle a commencé, sans que j'aie à le rappeler.",
+        "Lui montrer ce test et lui lire ensemble la définition des services rendus."
+      ],
+      h: 318,
+      icon: "🤝",
+      nom: "Les services rendus",
+      definition: "L'amour se prouve par des actes : aider l'autre et alléger son quotidien montre que l'on prend soin de lui.",
+      exemples: [
+        "Préparer le repas quand l'autre est fatigué.",
+        "S'occuper d'une tâche qu'il redoute (papiers, courses, ménage).",
+        "Faire le plein de la voiture ou lui préparer son café le matin."
+      ]
+    }
+  ];
+
+  const STORAGE_KEY = "langages-amour-notes";
+  let notes = {};
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (saved && typeof saved === "object") {
+      LANGAGES.forEach(l => {
+        const n = Number(saved[l.id]);
+        if (n >= 1 && n <= 5) notes[l.id] = n;
+      });
+    }
+  } catch (e) {}
+
+  const BADGES = ["Mon langage principal", "Mon deuxième langage"];
+  const grid = document.getElementById("grid");
+  const TOTAL = LANGAGES.length;
+
+  // Étapes 0 à TOTAL-1 : un langage par étape ; étape TOTAL : le classement ; étape TOTAL+1 : les exemples pour le/la partenaire.
+  // Au chargement, on reprend au premier langage non noté.
+  let etape = LANGAGES.findIndex(l => !notes[l.id]);
+  if (etape === -1) etape = TOTAL;
+
+  LANGAGES.forEach(l => {
+    const card = document.createElement("article");
+    card.className = "card";
+    card.dataset.id = l.id;
+    card.style.setProperty("--h", l.h);
+    card.innerHTML = `
+      <div class="icon" aria-hidden="true">${l.icon}</div>
+      <h2>${l.nom}</h2>
+      <p class="definition">${l.definition}</p>
+      <p class="examples-title">3 exemples</p>
+      <ul>${l.exemples.map(e => `<li>${e}</li>`).join("")}</ul>
+      <p class="rating-title">Ma note</p>
+      <div class="rating" role="group" aria-label="Note pour ${l.nom}">
+        ${[1, 2, 3, 4, 5].map(n => `<button class="star" data-note="${n}" aria-label="${n} sur 5" aria-pressed="false">♥</button>`).join("")}
+        <span class="rating-value"></span>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // À chaque arrivée sur le classement, on tire au hasard 5 exemples parmi les 25 de chaque langage.
+  let tirage = {};
+  function tirer() {
+    LANGAGES.forEach(l => {
+      const pool = l.partenaire.slice();
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      tirage[l.id] = pool.slice(0, 5);
+    });
+  }
+  tirer();
+
+  // Tri par note décroissante ; à égalité, l'ordre d'origine est conservé et le rang est partagé.
+  function classement() {
+    const notes_ = LANGAGES.filter(l => notes[l.id]).sort((a, b) => notes[b.id] - notes[a.id]);
+    return notes_.map(l => ({
+      ...l,
+      note: notes[l.id],
+      rang: 1 + notes_.filter(o => notes[o.id] > notes[l.id]).length
+    }));
+  }
+
+  function render() {
+    const fini = etape >= TOTAL;
+    document.getElementById("quiz").hidden = fini;
+    document.getElementById("result").hidden = etape !== TOTAL;
+    document.getElementById("invite").hidden = etape !== TOTAL;
+    document.getElementById("conseils").hidden = etape !== TOTAL + 1;
+
+    if (!fini) {
+      const note = notes[LANGAGES[etape].id];
+      document.getElementById("progress-label").textContent = `Langage ${etape + 1} sur ${TOTAL}`;
+      document.getElementById("progress-fill").style.width = ((etape + 1) / TOTAL * 100) + "%";
+      document.getElementById("prev").hidden = etape === 0;
+      const next = document.getElementById("next");
+      next.disabled = !note;
+      next.textContent = etape === TOTAL - 1 ? "Voir mon classement →" : "Suivant →";
+      document.getElementById("nav-hint").textContent = note ? "" : "Donnez une note pour continuer.";
+    }
+
+    document.querySelectorAll(".card").forEach((card, i) => {
+      card.hidden = i !== etape;
+      const note = notes[card.dataset.id] || 0;
+      card.classList.toggle("is-rated", note > 0);
+      card.querySelectorAll(".star").forEach(s => {
+        const n = Number(s.dataset.note);
+        s.classList.toggle("on", n <= note);
+        s.setAttribute("aria-pressed", n === note);
+      });
+      card.querySelector(".rating-value").textContent = note ? note + "/5" : "";
+    });
+
+    // Les deux premiers du classement sont mis en avant et reçoivent leurs conseils.
+    const liste = classement();
+    document.getElementById("ranking").innerHTML = liste.map((l, i) => `
+      <li class="${i < 2 ? "top" : ""}" style="--h:${l.h}">
+        <span class="rank">${l.rang}</span>
+        <span aria-hidden="true">${l.icon}</span>
+        <span class="rank-name">${i < 2 ? `<span class="rank-badge">♥ ${BADGES[i]}</span>` : ""}${l.nom}</span>
+        <span class="rank-score">${"♥".repeat(l.note)}<small>${l.note}/5</small></span>
+      </li>`).join("");
+
+    const principaux = liste.slice(0, 2).map(l => `« ${l.nom} »`).join(" et ");
+    document.getElementById("invite-text").textContent = `Envie de découvrir comment communiquer ${principaux} à votre partenaire ? Voici 5 idées concrètes pour chacun.`;
+
+    document.getElementById("conseils").innerHTML = liste.length ? `
+      <p class="conseils-intro">Comment communiquer ${principaux} à mon/ma partenaire</p>` +
+      liste.slice(0, 2).map((l, i) => `
+      <section class="tips" style="--h:${l.h}">
+        <div class="icon" aria-hidden="true">${l.icon}</div>
+        <h2>${l.nom}</h2>
+        <p class="examples-title">${BADGES[i]} · 5 exemples</p>
+        <ol>${tirage[l.id].map(e => `<li>${e}</li>`).join("")}</ol>
+      </section>`).join("") + `
+      <button class="btn-plain" data-retour>Retour à mon classement</button>` : "";
+
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); } catch (e) {}
+  }
+
+  grid.addEventListener("click", e => {
+    const star = e.target.closest(".star");
+    if (!star) return;
+    const id = star.closest(".card").dataset.id;
+    const n = Number(star.dataset.note);
+    if (notes[id] === n) delete notes[id]; else notes[id] = n;
+    render();
+  });
+
+  function aller(n) {
+    if (n === TOTAL && etape < TOTAL) tirer();
+    etape = n;
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.getElementById("prev").addEventListener("click", () => aller(etape - 1));
+  document.getElementById("next").addEventListener("click", () => aller(etape + 1));
+  document.getElementById("to-conseils").addEventListener("click", () => aller(TOTAL + 1));
+  document.getElementById("conseils").addEventListener("click", e => {
+    if (e.target.closest("[data-retour]")) aller(TOTAL);
+  });
+  document.getElementById("edit").addEventListener("click", () => aller(0));
+
+  document.getElementById("reset").addEventListener("click", () => {
+    notes = {};
+    aller(0);
+  });
+
+
+  render();
+</script>
+</body>
+</html>
